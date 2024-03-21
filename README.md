@@ -1,5 +1,5 @@
-After downloaded, run 
+# install dependencies
 npm install
 
-To start the project
+# serve
 npm start
