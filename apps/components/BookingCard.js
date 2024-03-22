@@ -5,11 +5,13 @@ import Icon from "react-native-vector-icons/FontAwesome";
 
 function BookingCard({ booking }) {
   const bookingId = booking.bookingid;
+  const [loading, setLoading] = useState(false);
   const deleteBooking = async (bookingID) => {
     alert(bookingID);
     const token = await AsyncStorage.getItem("tokenUser");
     if (startDate && endDate) {
       try {
+        setLoading(true);
         const response = await fetch(`${config.apiURL}booking/${bookingID}`, {
           method: "DELETE",
           headers: {
@@ -26,6 +28,8 @@ function BookingCard({ booking }) {
       } catch (error) {
         console.error("Error occurred while deleting booking:", error);
         alert("An error occurred while deleting booking");
+      } finally{
+        setLoading(false)
       }
     }
   };
