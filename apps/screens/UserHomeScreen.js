@@ -75,9 +75,12 @@ function UserHomeScreen(props) {
     setTotalCost(cost)
   }
 
+  const [loading, setLoading] = useState(false);
+
   const bookNow = async()=>{
     if(startDate && endDate){
       try {
+        setLoading(true);
         const response = await fetch(`${config.apiURL}booking`, {
           method: "POST",
           headers: {
@@ -101,7 +104,8 @@ function UserHomeScreen(props) {
        
       } catch (error) {
         console.error('Error occurred while submit:', error);
-        // Handle error here
+      } finally{
+        setLoading(false);
       }
     }
   }
@@ -118,23 +122,25 @@ function UserHomeScreen(props) {
   return (
     <SafeAreaView>
       <View style={styles.container}>
-        <View style={styles.row}>
-          <Image
-            style={styles.cardImage}
-            source={{ uri: "https://picsum.photos/200/300" }}
-          ></Image>
-          <View>
-            <TouchableOpacity onPress={() => setModalVisible(true)}>
-              <View style={styles.userNameRow}>
-                <Text style={styles.cardName}>{userName}</Text>
-                <Icon
-                  name="edit"
-                  size={20}
-                  onPress={() => setModalVisible(true)}
-                />
-              </View>
-            </TouchableOpacity>
-            <Text style={styles.mutedText}>from Malaysia Johor</Text>
+        <View style={styles.card}>
+          <View style={styles.row}>
+            <Image
+              style={styles.cardImage}
+              source={{ uri: "https://picsum.photos/200/300" }}
+            ></Image>
+            <View>
+              <TouchableOpacity onPress={() => setModalVisible(true)}>
+                <View style={styles.userNameRow}>
+                  <Text style={styles.cardName}>{userName}</Text>
+                  <Icon
+                    name="edit"
+                    size={20}
+                    onPress={() => setModalVisible(true)}
+                  />
+                </View>
+              </TouchableOpacity>
+              <Text style={styles.mutedText}>from Malaysia Johor</Text>
+            </View>
           </View>
         </View>
         <Modal
@@ -165,65 +171,74 @@ function UserHomeScreen(props) {
             </View>
           </View>
         </Modal>
-
-        <View>
-          <Text style={styles.cardTitle}>Pick Check In Date</Text>
-        </View>
-        <View>
-          {showDatePicker && (
-            <DateTimePicker
-              value={startDate}
-              mode="date"
-              display="default"
-              minimumDate={today}
-              onChange={handleStartDateChange}
-            />
-          )}
-          <Text style={styles.viewMargin}>Selected Date: {startDate.toLocaleDateString()}</Text>
-        </View>
-        <View>
-          <Text style={styles.cardTitle}>Pick Check Out Date</Text>
-        </View>
-        <View>
-          {showDatePicker && (
-            <DateTimePicker
-              value={endDate}
-              minimumDate={startDate}
-              mode="date"
-              display="default"
-              onChange={handleEndDateChange}
-            />
-          )}
-          <Text style={styles.viewMargin}>Selected Date: {endDate.toLocaleDateString()}</Text>
-        </View>
-        <View style={styles.viewMargin}>
-          <Text style={styles.cardTitle}>Choose a Specialty</Text>
-        </View>
-        <View style={styles.viewMargin}>
-          <View style={styles.tagContainer}>
-            {specialties.map((specialty, index) => (
-              <TouchableOpacity style={styles.tabPill} key={index}>
-                <Text
-                  style={styles.tabPillText}
-                  onPress={() => handleSelectSepcialty(specialty)}
-                >
-                  {specialty}
-                </Text>
-              </TouchableOpacity>
-            ))}
+        
+        <View style={styles.card}>
+          <View>
+            <Text style={styles.cardTitle}>Pick Check In Date</Text>
           </View>
-          <Text>Selected: {selectedSpecialty}</Text>
+          <View>
+            {showDatePicker && (
+              <DateTimePicker
+                value={startDate}
+                mode="date"
+                display="default"
+                minimumDate={today}
+                onChange={handleStartDateChange}
+              />
+            )}
+            <Text>Selected Date: {startDate.toLocaleDateString()}</Text>
+          </View>
+        </View>
+
+        <View style={styles.card}>
+        <View>
+            <Text style={styles.cardTitle}>Pick Check Out Date</Text>
+          </View>     
+          <View>
+            {showDatePicker && (
+              <DateTimePicker
+                value={endDate}
+                minimumDate={startDate}
+                mode="date"
+                display="default"
+                onChange={handleEndDateChange}
+              />
+            )}
+            <Text>Selected Date: {endDate.toLocaleDateString()}</Text>
+          </View>
+        </View>
+
+        <View style={styles.card}>
+        <View style={styles.viewMargin}>
+            <Text style={styles.cardTitle}>Choose a Specialty</Text>
+          </View>
+          <View style={styles.viewMargin}>
+            <View style={styles.tagContainer}>
+              {specialties.map((specialty, index) => (
+                <TouchableOpacity style={styles.tabPill} key={index}>
+                  <Text
+                    style={styles.tabPillText}
+                    onPress={() => handleSelectSepcialty(specialty)}
+                  >
+                    {specialty}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            <Text>Selected: {selectedSpecialty}</Text>
+          </View>
         </View>
         
-        <View>
-              <Text>MYR {totalCost}</Text>
-        </View>
+        <View style={styles.card}>
+          <View style={styles.priceArea}>
+                <Text style={styles.price}>MYR {totalCost}</Text>
+          </View>
 
-
-        <View>
-          <TouchableOpacity style={styles.bookingBtn} onPress={bookNow}>
-            <Text style={styles.bookingText}>Book Now !</Text>
-          </TouchableOpacity>
+          <View>
+            <TouchableOpacity style={styles.bookingBtn} onPress={bookNow}>
+              <Text style={styles.bookingText}>{loading ? 'Submitting...' : 'Book Now!'}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
       </View>
@@ -235,20 +250,21 @@ const styles = StyleSheet.create({
   container: {
     paddingLeft: 10,
     paddingRight: 10,
+    paddingTop:10,
   },
   card: {
     shadowColor: "#000",
-    shadowOffset: { width: 5, height: 5 },
-    shadowOpacity: 0.75,
+    shadowOffset: { width: 1, height: 1 },
+    shadowOpacity: 0.3,
     shadowRadius: 17,
-    elevation: 10,
+    elevation: 1,
     backgroundColor: "#fff",
-    flexDirection: "row",
     padding: 10,
+    marginBottom:20,
+    borderRadius:5,
   },
   row: {
     flexDirection: "row",
-    padding: 10,
   },
   cardName: {
     fontWeight: "bold",
@@ -326,6 +342,15 @@ const styles = StyleSheet.create({
   },
   bookingText:{
     color:"white"
+  },
+  priceArea:{
+    justifyContent:"center",
+    alignItems:"center"
+  },
+  price:{
+    marginTop:20,
+    fontWeight:"bold",
+    fontSize:20,
   }
 });
 

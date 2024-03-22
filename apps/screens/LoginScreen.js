@@ -40,7 +40,7 @@ function LoginScreen(props) {
           );
           AsyncStorage.setItem('tokenUser', data.token);
           AsyncStorage.setItem('admin', '1');
-          navigation.navigate('Home'); 
+          navigation.navigate('Booking List'); 
         }else if(username == 'user'){
           alert(
             "Login As User Success!"
